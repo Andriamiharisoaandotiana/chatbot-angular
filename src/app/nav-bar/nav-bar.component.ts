@@ -1,11 +1,13 @@
 import { CommonModule } from '@angular/common';
-import { Component, HostListener } from '@angular/core';
+import { Component, HostListener, ChangeDetectorRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { faSun, faMoon } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-nav-bar',
   standalone: true,
-  imports: [FormsModule, CommonModule],
+  imports: [FormsModule, CommonModule, FontAwesomeModule],
   templateUrl: './nav-bar.component.html',
   styleUrls: ['./nav-bar.component.scss'], // Correction ici
 })
@@ -13,6 +15,11 @@ export class NavBarComponent {
   menuActive = false;
   isDropdownOpen = false;
   isMobileMenuOpen = false;
+  isDarkMode = false;
+  faSun = faSun;
+  faMoon = faMoon;
+  
+  constructor(private cdr: ChangeDetectorRef) {}
 
   toggleDropdown(event: Event) {
     event.stopPropagation(); // Empêche la propagation pour éviter la fermeture immédiate
@@ -23,6 +30,22 @@ export class NavBarComponent {
   toggleMobileMenu() {
     this.isMobileMenuOpen = !this.isMobileMenuOpen;
     console.log('Mobile menu toggled:', this.isMobileMenuOpen);
+  }
+
+  toggleDarkMode() {
+    this.isDarkMode = !this.isDarkMode;
+    console.log('Mode sombre activé ?', this.isDarkMode);
+    localStorage.setItem('theme', this.isDarkMode ? 'dark' : 'light');
+    this.applyTheme();
+    this.cdr.detectChanges(); // Force la détection de changements
+  }
+
+  applyTheme() {
+    if (this.isDarkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
   }
 
   @HostListener('document:click', ['$event'])
